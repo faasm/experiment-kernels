@@ -19,13 +19,15 @@ for exp in ${EXPERIMENTS[@]}; do
     ./scripts/small/${exp}
 done
 
-echo "----------------------------------------"
-echo " WIDE EXPERIMENTS"
-echo "----------------------------------------"
-for exp in ${EXPERIMENTS[@]}; do
-    echo " Experiment: ${exp}"
-    ./scripts/wide/${exp}
-done
+# WARNING: Wide experiments take up to 64 GB of memory, don't run unless your
+# machine can handle it.
+# echo "----------------------------------------"
+# echo " WIDE EXPERIMENTS"
+# echo "----------------------------------------"
+# for exp in ${EXPERIMENTS[@]}; do
+#     echo " Experiment: ${exp}"
+#     ./scripts/wide/${exp}
+# done
 
 popd >> /dev/null
 
