@@ -7,12 +7,14 @@ echo "     ParRes Kernels Native Benchmark    "
 echo "                                        "
 echo "----------------------------------------"
 
-EXPERIMENTS=("allmpi1" "allopenmp" "allmpiopenmp" )
+pushd ../Kernels >> /dev/null
+
+EXPERIMENTS=("runmpi1" "runopenmp" "runmpiopenmp" )
 
 echo "----------------------------------------"
 echo " SMALL EXPERIMENTS"
 echo "----------------------------------------"
-for np in ${NUM_PROCS[@]}; do
+for exp in ${EXPERIMENTS[@]}; do
     echo " Experiment: ${exp}"
     ./scripts/small/${exp}
 done
@@ -20,8 +22,10 @@ done
 echo "----------------------------------------"
 echo " WIDE EXPERIMENTS"
 echo "----------------------------------------"
-for np in ${NUM_PROCS[@]}; do
+for exp in ${EXPERIMENTS[@]}; do
     echo " Experiment: ${exp}"
     ./scripts/wide/${exp}
 done
+
+popd >> /dev/null
 
