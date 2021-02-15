@@ -28,8 +28,8 @@ PRK_CMDLINE = {
     "transpose": "{} 2000 64".format(ITERATIONS),  # iterations, matrix order, tile size
 }
 
-# PRK_NATIVE_BUILD = "/code/Kernels"
-PRK_NATIVE_BUILD = "/home/csegarra/experiments/Kernels"
+PRK_NATIVE_BUILD = "/code/Kernels"
+# PRK_NATIVE_BUILD = "/home/csegarra/experiments/Kernels"
 
 PRK_NATIVE_EXECUTABLES = {
     "dgemm": join(PRK_NATIVE_BUILD, "MPI1", "DGEMM", "dgemm"),
@@ -56,8 +56,8 @@ PRK_STATS = {
 }
 
 MPI_RUN = "mpirun"
-# HOSTFILE = "/home/mpirun/hostfile"
-HOSTFILE = "/home/csegarra/experiments/experiment-kernels/run/hostfile"
+HOSTFILE = "/home/mpirun/hostfile"
+# HOSTFILE = "/home/csegarra/experiments/experiment-kernels/run/hostfile"
 
 
 def is_power_of_two(n):
@@ -154,7 +154,7 @@ if __name__ == "__main__":
         for np in procs:
             results[func].append(invoke(func, np))
 
-    with open("./results/kernels_native_k8s_hist.dat", "w") as fh:
+    with open("./kernels_native_k8s_hist.dat", "w") as fh:
         keys = results.keys()
         fh.write("#" + ",".join(keys) + "\n")
         for ind, np in enumerate(procs):
@@ -163,7 +163,7 @@ if __name__ == "__main__":
                 out_str += " {}".format(results[key][ind])
             fh.write(out_str + "\n")
 
-    with open("./results/kernels_native_k8s_line.dat", "w") as fh:
+    with open("./kernels_native_k8s_line.dat", "w") as fh:
         keys = results.keys()
         fh.write("#" + ",".join(keys) + "\n")
         for key in keys:

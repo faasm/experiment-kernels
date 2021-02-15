@@ -10,9 +10,16 @@ rely on the version available in Docker Hub):
 ./docker/build/kernels.sh
 ```
 
-Then, to run the experiments locally:
+## Run in Microk8s
+
+Running in `microk8s` should be straightforward and just a matter of running:
 ```
-docker run --rm faasm/experiment-kernels-native:0.0.1
+microk8s kubectl apply -f ./k8s/deployment.yaml
+
+./k8s/run_benchmark.sh
 ```
+
+This should generate a data file under the results folder ready to be fed into
+the `gnuplot` scripts.
 
 ## Running in Azure
