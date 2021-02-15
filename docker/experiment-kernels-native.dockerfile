@@ -18,9 +18,15 @@ RUN apt update
 # Dev tools delete eventually
 RUN apt install -y gdb vim 
 
-USER mpirun
+# Set up SSH
+RUN apt update && apt upgrade -y
+RUN apt install -y openssh-server
+RUN mkdir /var/run/sshd
+RUN echo 'root:${USER}' | chpasswd
+RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 
-# Download LAMMPS code
+# Download the ParRes Kernels code
 WORKDIR /code
 RUN git clone -b native https://github.com/faasm/Kernels
 
@@ -32,4 +38,20 @@ WORKDIR /code/experiment-kernels
 # Compile LAMMPS
 RUN ./build/kernels.sh
 
-ENTRYPOINT ./run/all.sh
+# Patches (order when it works)
+ENV HOME /home/${USER}
+WORKDIR ${HOME}/.ssh
+COPY ./ssh/config config
+COPY ./ssh/id_rsa.mpi id_rsa
+COPY ./ssh/id_rsa.mpi.pub id_rsa.pub
+COPY ./ssh/id_rsa.mpi.pub authorized_keys
+RUN ssh-keygen -A
+RUN chmod -R 600 ${HOME}/.ssh* && \
+    chmod 700 ${HOME}/.ssh && \
+    chmod 644 ${HOME}/.ssh/id_rsa.pub && \
+    chmod 664 ${HOME}/.ssh/config && \
+    chown -R ${USER}:${USER} ${HOME}/.ssh
+WORKDIR ${HOME}
+
+# Start the SSH server for reachability
+CMD ["/usr/sbin/sshd", "-D"]

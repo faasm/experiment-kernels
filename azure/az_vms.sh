@@ -2,18 +2,24 @@
 
 set -e
 
+THIS_DIR=$(dirname $(readlink -f $0))
+PROJ_DIR=${THIS_DIR}/..
 CLUSTER_NAME="faasmVMcluster"
 
+pushd ${PROJ_DIR} >> /dev/null
+
 if [[ $1 == "create" ]]; then
-    echo "Creating the VM scale set"
+    COUNT=${2:-1}
+    echo "Creating the VM scale set with $COUNT VMs"
     az vmss create \
         --resource-group faasm \
         --name ${CLUSTER_NAME} \
         --image UbuntuLTS \
-        --size Standard_DS2_v2 \
+        --instance-count 1 \
+        --vm-sku Standard_DS2_v2 \
         --admin-username faasm \
         --generate-ssh-keys \
-        --custom-data cloud_init_docker.yaml
+        --custom-data ./azure/cloud_init_docker.yaml
 elif [[ $1 == "delete" ]]; then
     az vmss stop \
         --resource-group faasm \
@@ -49,4 +55,6 @@ else
     echo "usage: ./az_vms.sh [create|delete|list|scale|start|stop]"
     exit 1
 fi
+
+popd >> /dev/null
 
