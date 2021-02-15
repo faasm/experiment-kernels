@@ -16,14 +16,23 @@ if [[ $1 == "create" ]]; then
         --name ${CLUSTER_NAME} \
         --image UbuntuLTS \
         --instance-count 1 \
-        --vm-sku Standard_DS2_v2 \
+        --vm-sku Standard_D2_v2 \
+        --public-ip-per-vm \
         --admin-username faasm \
-        --generate-ssh-keys \
-        --custom-data ./azure/cloud_init_docker.yaml
-elif [[ $1 == "delete" ]]; then
-    az vmss stop \
+        --generate-ssh-keys
+elif [[ $1 == "deallocate" ]]; then
+    az vmss deallocate \
         --resource-group faasm \
         --name ${CLUSTER_NAME}
+elif [[ $1 == "delete" ]]; then
+    az vmss delete \
+        --resource-group faasm \
+        --name ${CLUSTER_NAME}
+elif [[ $1 == "ip" ]]; then
+    az vmss list-instance-public-ips \
+        --resource-group faasm \
+        --name ${CLUSTER_NAME} \
+        --output table
 elif [[ $1 == "list" ]]; then
     az vmss list-instances \
         --resource-group faasm \
@@ -44,7 +53,7 @@ elif [[ $1 == "start" ]]; then
     echo "Starting the cluster instances"
     az vmss start \
         --resource-group faasm \
-        --name ${CLUSTER_NAME}
+        --name ${CLUSTER_NAME} &
 elif [[ $1 == "stop" ]]; then
     echo "Stopping the cluster instances"
     az vmss stop \

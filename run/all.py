@@ -56,8 +56,8 @@ PRK_STATS = {
 }
 
 MPI_RUN = "mpirun"
-HOSTFILE = "/home/mpirun/hostfile"
-# HOSTFILE = "/home/csegarra/experiments/experiment-kernels/run/hostfile"
+# HOSTFILE = "/home/mpirun/hostfile"
+HOSTFILE = "/code/experiment-kernels/hostfile"
 
 
 def is_power_of_two(n):
@@ -109,7 +109,7 @@ def invoke(func, np=8):
         exit(1)
 
     executable = PRK_NATIVE_EXECUTABLES[func]
-    cmd_out = mpi_run(executable, np=np, cmdline=cmdline)
+    cmd_out = mpi_run(executable, np=np, hostfile=HOSTFILE, cmdline=cmdline)
     cmd_out = cmd_out.decode()
     print(cmd_out)
 
@@ -143,7 +143,8 @@ def _parse_prk_out(func, cmd_out):
 
 
 if __name__ == "__main__":
-    procs = [1, 2, 4, 8, 16]
+    # procs = [1, 2, 4, 8, 16]
+    procs = [1, 2, 4, 8]
     results = {}
     out_format = "packed"  # unpacked
 

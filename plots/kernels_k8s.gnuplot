@@ -24,7 +24,9 @@ set ylabel "Time Elapsed [ms]"
 set ytics 40
 
 plot for [i=0:8] '../results/kernels_native_k8s_line.dat' \
-       using 1:($2 * 1000) every :::i::i w lp pt 7 title get_legend(i) 
+       using 1:($2 * 1000) every :::i::i w lp pt 7 title get_legend(i), \
+     for [i=0:8] '../results/kernels_native_vms_line.dat' \
+       using 1:($2 * 1000) every :::i::i w lp pt 7 dt 2 title get_legend(i) 
 
 !epstopdf 'kernels_k8s.eps'
 !rm 'kernels_k8s.eps'
