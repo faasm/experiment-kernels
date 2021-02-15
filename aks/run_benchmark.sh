@@ -5,7 +5,7 @@ set -e
 # Experiment variables
 ROOT_DIR=/code/experiment-lammps-native
 CLUSTER_SIZE=5
-MPI_PROCS_PER_NODE=5
+MPI_PROCS_PER_NODE=2
 echo "----------------------------------------"
 echo "      Kernels Native k8s Benchmark      "
 echo "                                        "
@@ -20,23 +20,22 @@ echo "----------------------------------------"
 echo "----------------------------------------"
 
 # Generate the corresponding host file
-MPI_MAX_PROC=${MPI_PROCS_PER_NODE} source ./k8s/gen_host_file.sh
+MPI_MAX_PROC=${MPI_PROCS_PER_NODE} source ./aks/gen_host_file.sh
 echo "----------------------------------------"
 
 # Copy the run batch script just in case we have changed something (so that we
 # don't have to rebuild the image)
-sudo microk8s kubectl cp ./run/all.py ${MPI_MASTER}:/home/mpirun/
+kubectl cp ./run/all.py ${MPI_MASTER}:/home/mpirun/
 
 # Run the benchmark at the master
-sudo microk8s \
-    kubectl exec -it \
+kubectl exec -it \
     ${MPI_MASTER} -- bash -c "su mpirun -c '/home/mpirun/all.py'"
 echo "----------------------------------------"
 
 # Grep the results
 mkdir -p ./results
-sudo microk8s kubectl cp ${MPI_MASTER}:/home/mpirun/kernels_native_k8s_line.dat \
-    ./results/kernels_native_k8s_line.dat
+kubectl cp ${MPI_MASTER}:/home/mpirun/kernels_native_k8s_line.dat \
+    ./results/kernels_native_aks_line.dat
 
 # Plot them
 # pushd plot >> /dev/null
