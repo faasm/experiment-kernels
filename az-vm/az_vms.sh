@@ -15,7 +15,7 @@ if [[ $1 == "create" ]]; then
         --resource-group faasm \
         --name ${CLUSTER_NAME} \
         --image UbuntuLTS \
-        --instance-count 1 \
+        --instance-count ${COUNT} \
         --vm-sku Standard_D2_v2 \
         --public-ip-per-vm \
         --admin-username faasm \
