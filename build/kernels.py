@@ -19,12 +19,12 @@ def build(clean=False):
         ("MPI1/Synch_global", "global"),
         ("MPI1/Synch_p2p", "p2p"),
         ("MPI1/Sparse", "sparse"),
-        ("MPI1/transpose", "transpose"),
-        ("MPI1/stencil", "stencil"),
-        ("MPI1/dgemm", "dgemm"),
-        ("MPI1/nstream", "nstream"),
-        ("MPI1/reduce", "reduce"),
-        ("MPI1/random", "random"),
+        ("MPI1/Transpose", "transpose"),
+        ("MPI1/Stencil", "stencil"),
+        ("MPI1/DGEMM", "dgemm"),
+        ("MPI1/Nstream", "nstream"),
+        ("MPI1/Reduce", "reduce"),
+        ("MPI1/Random", "random"),
     ]
 
     if clean:
@@ -43,6 +43,8 @@ def build(clean=False):
             return
 
     # Copy the kernels in place
+    if not exists(WASM_DIR):
+        mkdir(WASM_DIR)
     prk_wasm_dest = join(WASM_DIR, "prk")
     if not exists(prk_wasm_dest):
         mkdir(prk_wasm_dest)

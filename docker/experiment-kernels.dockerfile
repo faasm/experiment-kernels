@@ -14,3 +14,5 @@ WORKDIR /code/experiment-kernels
 
 # Compile LAMMPS
 RUN ./build/kernels.py
+
+WORKDIR /usr/local/code/faasm
