@@ -7,9 +7,9 @@ from os.path import join
 from subprocess import check_output, DEVNULL
 
 from faasmcli.util.call import invoke_impl
-from faasmcli.util.endpoints import get_invoke_host_port
 
 
+FAASM_USER = "prk"
 ITERATIONS = 20
 SPARSE_GRID_SIZE_2LOG = 10
 SPARSE_GRID_SIZE = pow(2, SPARSE_GRID_SIZE_2LOG)
@@ -118,15 +118,13 @@ def invoke(func, np=8, native=False):
         cmd_out = cmd_out.decode()
         print(cmd_out)
     else:
-        host, port = get_invoke_host_port()
         cmd_out = invoke_impl(
             FAASM_USER,
             func,
             cmdline=cmdline,
-            host=host,
-            port=port,
             mpi_world_size=np,
         )
+        print(cmd_out)
 
     return _parse_prk_out(func, cmd_out)
 
@@ -159,7 +157,7 @@ def _parse_prk_out(func, cmd_out):
 
 if __name__ == "__main__":
     # procs = [1, 2, 4, 8, 16]
-    procs = [1, 2, 4, 8]
+    procs = [1]
     results = {}
     out_format = "packed"  # unpacked
 
@@ -170,7 +168,8 @@ if __name__ == "__main__":
         native = False
 
     # results are in seconds
-    for func in PRK_STATS:
+    # for func in PRK_STATS:
+    for func in ["nstream"]:
         if func not in results:
             results[func] = []
         for np in procs:

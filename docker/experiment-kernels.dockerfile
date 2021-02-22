@@ -22,3 +22,17 @@ WORKDIR /code/experiment-kernels
 
 # Compile the ParRes Kernels
 RUN ./build/kernels.py
+
+# Copy the runner code
+# TODO cleaner way to do this?
+COPY \
+    /code/experiment-kernels/src/runner/kernels_pool_runner.cpp \
+    /usr/local/code/faasm/src/runner/kernels_pool_runner.cpp
+# Override runner's CMakeLists
+COPY \
+    /code/experiment-kernels/src/runner/CMakeLists.txt \
+    /usr/local/code/faasm/src/runner/CMakeLists.txt
+# Compile LAMMPS custom runner
+WORKDIR /usr/local/code/faasm
+RUN inv -r faasmcli/faasmcli dev.cc kernels_pool_runner
+
