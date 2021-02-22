@@ -6,6 +6,10 @@ import sys
 from os.path import join
 from subprocess import check_output, DEVNULL
 
+from faasmcli.util.call import invoke_impl
+from faasmcli.util.endpoints import get_invoke_host_port
+
+
 ITERATIONS = 20
 SPARSE_GRID_SIZE_2LOG = 10
 SPARSE_GRID_SIZE = pow(2, SPARSE_GRID_SIZE_2LOG)
@@ -87,7 +91,7 @@ def mpi_run(exe, np=1, hostfile=None, cmdline=None):
     return output
 
 
-def invoke(func, np=8):
+def invoke(func, np=8, native=False):
     """
     Invoke one of the ParRes Kernels functions
     """
@@ -108,10 +112,21 @@ def invoke(func, np=8):
         )
         exit(1)
 
-    executable = PRK_NATIVE_EXECUTABLES[func]
-    cmd_out = mpi_run(executable, np=np, hostfile=HOSTFILE, cmdline=cmdline)
-    cmd_out = cmd_out.decode()
-    print(cmd_out)
+    if native:
+        executable = PRK_NATIVE_EXECUTABLES[func]
+        cmd_out = mpi_run(executable, np=np, hostfile=HOSTFILE, cmdline=cmdline)
+        cmd_out = cmd_out.decode()
+        print(cmd_out)
+    else:
+        host, port = get_invoke_host_port()
+        cmd_out = invoke_impl(
+            FAASM_USER,
+            func,
+            cmdline=cmdline,
+            host=host,
+            port=port,
+            mpi_world_size=np,
+        )
 
     return _parse_prk_out(func, cmd_out)
 
@@ -148,12 +163,18 @@ if __name__ == "__main__":
     results = {}
     out_format = "packed"  # unpacked
 
+    # Check if we are running native or not
+    if (len(sys.argv) > 1) and (sys.argv[1] == "native"):
+        native = True
+    else:
+        native = False
+
     # results are in seconds
     for func in PRK_STATS:
         if func not in results:
             results[func] = []
         for np in procs:
-            results[func].append(invoke(func, np))
+            results[func].append(invoke(func, np, native=native))
 
     with open("./kernels_native_k8s_hist.dat", "w") as fh:
         keys = results.keys()
@@ -164,7 +185,8 @@ if __name__ == "__main__":
                 out_str += " {}".format(results[key][ind])
             fh.write(out_str + "\n")
 
-    with open("./kernels_native_k8s_line.dat", "w") as fh:
+    file_name = "./kernels_{}k8s_line.dat".format("native_" if native else "")
+    with open(file_name, "w") as fh:
         keys = results.keys()
         fh.write("#" + ",".join(keys) + "\n")
         for key in keys:

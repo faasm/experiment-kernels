@@ -60,7 +60,7 @@ def build(clean=False):
 
 
 if __name__ == "__main__":
-    if (len(sys.argv) > 1) and (sys.argv[1] == "clean"):
+    if (len(sys.argv) > 1) and (sys.argv[1] == "--clean"):
         build(clean=True)
     else:
         build()
