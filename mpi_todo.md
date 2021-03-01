@@ -1,6 +1,11 @@
 # ParRes Kernels WASM Build and Run
 
-Build is working fine. Running locally most of the functions work all right:
+Build is working fine. Running locally most of the functions work all right.
+To run, from within the client container run:
+```
+inv upload.user prk
+kernels_pool_runner <func_name: dgemm, global, nstream, ..> <np>
+```
 
 ## DGEMM
 + Missing import `env.{MPI_Comm_group,MPI_Group_incl,MPI_Comm_create}`
