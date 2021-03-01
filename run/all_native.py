@@ -6,9 +6,6 @@ import sys
 from os.path import join
 from subprocess import check_output, DEVNULL
 
-# from faasmcli.util.call import invoke_impl
-
-
 FAASM_USER = "prk"
 ITERATIONS = 20
 SPARSE_GRID_SIZE_2LOG = 10
@@ -61,7 +58,6 @@ PRK_STATS = {
 
 MPI_RUN = "mpirun"
 HOSTFILE = "/home/mpirun/hostfile"
-# HOSTFILE = "/code/experiment-kernels/hostfile"
 
 
 def is_power_of_two(n):
@@ -91,7 +87,7 @@ def mpi_run(exe, np=1, hostfile=None, cmdline=None):
     return output
 
 
-def invoke(func, np=8, native=False):
+def invoke(func, np=8):
     """
     Invoke one of the ParRes Kernels functions
     """
@@ -112,19 +108,10 @@ def invoke(func, np=8, native=False):
         )
         exit(1)
 
-    if native:
-        executable = PRK_NATIVE_EXECUTABLES[func]
-        cmd_out = mpi_run(executable, np=np, hostfile=HOSTFILE, cmdline=cmdline)
-        cmd_out = cmd_out.decode()
-        print(cmd_out)
-    else:
-        cmd_out = invoke_impl(
-            FAASM_USER,
-            func,
-            cmdline=cmdline,
-            mpi_world_size=np,
-        )
-        print(cmd_out)
+    executable = PRK_NATIVE_EXECUTABLES[func]
+    cmd_out = mpi_run(executable, np=np, hostfile=HOSTFILE, cmdline=cmdline)
+    cmd_out = cmd_out.decode()
+    print(cmd_out)
 
     return _parse_prk_out(func, cmd_out)
 
@@ -156,34 +143,26 @@ def _parse_prk_out(func, cmd_out):
 
 
 if __name__ == "__main__":
-    # procs = [1]
     procs = [1, 2, 4, 8, 16]
     results = {}
-    out_format = "packed"  # unpacked
-
-    # Check if we are running native or not
-    if (len(sys.argv) > 1) and (sys.argv[1] == "native"):
-        native = True
-    else:
-        native = False
 
     # results are in seconds
     for func in PRK_STATS:
         if func not in results:
             results[func] = []
         for np in procs:
-            results[func].append(invoke(func, np, native=native))
+            results[func].append(invoke(func, np))
 
-    with open("./kernels_native_k8s_hist.dat", "w") as fh:
-        keys = results.keys()
-        fh.write("#" + ",".join(keys) + "\n")
-        for ind, np in enumerate(procs):
-            out_str = "{} ".format(np)
-            for key in keys:
-                out_str += " {}".format(results[key][ind])
-            fh.write(out_str + "\n")
+#     with open("./results.dat", "w") as fh:
+#         keys = results.keys()
+#         fh.write("#" + ",".join(keys) + "\n")
+#         for ind, np in enumerate(procs):
+#             out_str = "{} ".format(np)
+#             for key in keys:
+#                 out_str += " {}".format(results[key][ind])
+#             fh.write(out_str + "\n")
 
-    file_name = "./kernels_{}k8s_line.dat".format("native_" if native else "")
+    file_name = "./results.dat"
     with open(file_name, "w") as fh:
         keys = results.keys()
         fh.write("#" + ",".join(keys) + "\n")

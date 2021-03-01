@@ -7,7 +7,7 @@ DOCKER_DIR=${THIS_DIR}/..
 PROJ_ROOT=${THIS_DIR}/../..
 
 IMAGE_NAME="experiment-kernels-native"
-VERSION="0.0.1"
+VERSION="$(sed -n '2,2p' .env | cut -d"=" -f 2)"
 
 pushd ${PROJ_ROOT} >> /dev/null
 
@@ -20,6 +20,7 @@ docker build \
     ${NO_CACHE} \
     -t faasm/${IMAGE_NAME}:${VERSION} \
     -f ${DOCKER_DIR}/${IMAGE_NAME}.dockerfile \
+    --build-arg EXPERIMENTS_VERSION=${VERSION} \
     --build-arg FORCE_RECREATE=$(date +%s) \
     ${PROJ_ROOT}
 
