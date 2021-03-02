@@ -4,38 +4,76 @@ This repo contains the image, deployment files, and scripts to run the
 [ParRes Kernels](https://github.com/ParRes/Kernels) and benchmark its execution
 in the cloud.
 
+## Before Starting
+
+You must have first read the instructions in the [base experiments repository](
+  https://github.com/faasm/experiment-base).
+
+From now onwards, we will assume this repository and the base one are in the
+same level, i.e. `cat ../experiment-base/VERSION` prints the adequate version.
+
+## Building the docker images
+
 First you will have to build the image (alternatively, you can skip this part and
 rely on the version available in Docker Hub):
 ```
-./docker/build/kernels.sh
+./docker/build/kernels.sh # TODO
+./docker/build/kernels_native.sh
 ```
 
 ## Run locally in Microk8s
 
+### Native
+
 Running in `microk8s` should be straightforward and just a matter of running:
 ```bash
-microk8s kubectl apply -f ./k8s/deployment.yaml
-
-./k8s/run_benchmark.sh
+IMAGE_NAME=faasm/experiment-kernels-native:0.0.1 \
+  envsubst < ../experiment-base/uk8s/deployment.yaml |\
+  sudo microk8s kubectl apply -f -
 ```
 
-This should generate a data file under the results folder ready to be fed into
-the `gnuplot` scripts.
+Should you want to scale the deployment then run:
+```
+sudo microk8s kubectl scale \
+  --replicas=<REPLICA_SIZE> \
+  -f ../experiment-base/uk8s/deployment.yaml
+```
+
+Then, to run the benchmark:
+```
+EXPERIMENT="kernels_native_uk8s" RUN_SCRIPT=$(pwd)/run/all_native.py \
+  ../experiment-base/uk8s/run_mpi_benchmark.sh
+```
+This should populate the `results` folder in your local base repo.
+
+### WASM Experiments
 
 ## Run remotely in AKS
 
-Similarly, running in a k8s cluster in Azure should be also straightforward.
-First, you'll need to set up the `az` CLI. For a detailed explanation on how
-to do so, read this other [README](https://github.com/faasm/experiment-lammps-native).
-Then:
-```bash
-microk8s kubectl apply -f ./k8s/deployment.yaml
+Running in AKS should be very similar to running in uk8s.
 
-./k8s/run_benchmark.sh
+### Native
+
+```bash
+IMAGE_NAME=faasm/experiment-kernels-native:0.0.1 \
+  envsubst < ../experiment-base/uk8s/deployment.yaml |\
+  kubectl apply -f -
 ```
 
+Should you want to scale the deployment then run:
+```
+kubectl scale \
+  --replicas=<REPLICA_SIZE> \
+  -f ../experiment-base/uk8s/deployment.yaml
+```
+
+Then, to run the benchmark:
+```
+EXPERIMENT="kernels_native_aks" RUN_SCRIPT=$(pwd)/run/all_native.py \
+  ../experiment-base/aks/run_mpi_benchmark.sh
+```
 Which should also populate the same `results` folder.
 
+## Run remotely in a VM Scale Set
 
-
-## Running in Azure
+### Native
