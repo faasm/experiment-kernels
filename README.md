@@ -42,7 +42,7 @@ sudo microk8s kubectl scale \
 Then, to run the benchmark:
 ```
 EXPERIMENT="kernels_native_uk8s" RUN_SCRIPT=$(pwd)/run/all_native.py \
-  ../experiment-base/uk8s/run_benchmark.sh
+  ../experiment-base/uk8s/run_mpi_benchmark.sh
 ```
 This should populate the `results` folder in your local base repo.
 
@@ -70,6 +70,10 @@ kubectl scale \
 Then, to run the benchmark:
 ```
 EXPERIMENT="kernels_native_aks" RUN_SCRIPT=$(pwd)/run/all_native.py \
-  ../experiment-base/aks/run_benchmark.sh
+  ../experiment-base/aks/run_mpi_benchmark.sh
 ```
 Which should also populate the same `results` folder.
+
+## Run remotely in a VM Scale Set
+
+### Native
